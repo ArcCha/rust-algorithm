@@ -3,7 +3,7 @@ mod tests;
 
 pub trait BST {
   fn insert(&mut self, x: i32);
-
+  fn search(&self, key: i32) -> Option<i32>;
   fn get_inorder(&self) -> Vec<i32>;
 }
 
@@ -44,6 +44,20 @@ impl SimpleBST {
     };
   }
 
+  fn search_aux(curr: &Box<Node>, x: i32) -> Option<i32> {
+    match **curr {
+      Node::Null => None,
+      Node::Node{ key, .. } if key == x => Some(key),
+      Node::Node{ key, ref left, .. } if x < key => {
+        SimpleBST::search_aux(left, x)
+      },
+      Node::Node{ key, ref right, .. } if x > key => {
+        SimpleBST::search_aux(right, x)
+      },
+      Node::Node{ .. } => panic!("No cos poszlo nie tak.")
+    }
+  }
+
   fn insert_aux(curr: &mut Box<Node>, x: i32) {
     match **curr {
       Node::Null => *curr = Box::new(Node::Node {
@@ -67,6 +81,10 @@ impl BST for SimpleBST {
     self.size += 1;
     let r = &mut self.root;
     SimpleBST::insert_aux(r, x);
+  }
+
+  fn search(&self, key: i32) -> Option<i32> {
+    SimpleBST::search_aux(&self.root, key)
   }
 
   fn get_inorder(&self) -> Vec<i32> {
